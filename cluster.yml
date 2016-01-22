@@ -1,0 +1,48 @@
+elasticsearch-master-01:
+  image: elasticsearch
+  container_name: elasticsearch-master-01
+  command: elasticsearch -Des.node.name=master-01 -Des.node.data=false -Des.node.master=true --discovery.zen.ping.unicast.hosts=192.168.99.100
+  ports:
+    - 9200:9200
+    - 9300:9300
+
+elasticsearch-query-01:
+  image: elasticsearch
+  container_name: elasticsearch-query-01
+  command: elasticsearch -Des.node.name=query-01 -Des.node.data=false -Des.node.master=false --discovery.zen.ping.unicast.hosts=192.168.99.100
+  ports:
+    - 9201:9200
+    - 9301:9300
+  links:
+    - elasticsearch-master-01
+
+elasticsearch-data-01:
+  image: elasticsearch
+  container_name: elasticsearch-data-01
+  command: elasticsearch -Des.node.name=data-01 -Des.node.data=true -Des.node.master=false --discovery.zen.ping.unicast.hosts=192.168.99.100
+  ports:
+    - 9202:9200
+    - 9302:9300
+  links:
+    - elasticsearch-master-01
+
+elasticsearch-data-02:
+  image: elasticsearch
+  container_name: elasticsearch-data-02
+  command: elasticsearch -Des.node.name=data-02 -Des.node.data=true -Des.node.master=false --discovery.zen.ping.unicast.hosts=192.168.99.100
+  ports:
+    - 9203:9200
+    - 9303:9300
+  links:
+    - elasticsearch-master-01
+
+kibana-01:
+  image: kibana
+  container_name: kibana-01
+  ports:
+    - 5601:5601
+  environment:
+    - ELASTICSEARCH_URL=http://192.168.99.100:9200
+  links:
+    - elasticsearch-master-01
+  # command: kibana plugin --install elastic/sense
